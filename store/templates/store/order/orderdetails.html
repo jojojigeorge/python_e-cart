@@ -1,0 +1,52 @@
+{% extends 'store/layouts/main.html' %}
+
+{% block content %}
+    <div class="py-2 topbar">
+        <div class="container">
+            <a class="" href="{% url 'home' %}">Home /</a>
+            <a class="" href="{% url 'collections' %}">Collections /</a>
+        </div>
+    </div>
+    <div class="py-5 wishlistdiv">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 m-auto ">
+                    <div class="card shadow  ">
+                        <div class="card-body m-auto ">
+                            <div class="card shadow text-center text-white  my-5  " style="background-color: #ff6600;">
+                                <h4 class="mt-2">My Order</h4>
+                            </div>
+                            {% if order %}
+                                    <table class="table table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th>Order date</th>
+                                                <th>Tracking no</th>
+                                                <th>Total price</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for ord in order %}
+                                                <tr>
+                                                    <td>{{ ord.created_at}}</td>
+                                                    <td>{{ ord.tracking_no}}</td>
+                                                    <td>{{ ord.total_price}}</td>
+                                                    <td>{{ ord.status}}</td>
+                                                    <td><a href="{% url 'displayorder' ord.tracking_no %}"class="btn "style="background-color: #ff6600;">View</a></td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                            {% else %}
+                                <h4>No order history</h4>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

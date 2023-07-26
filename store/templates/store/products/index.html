@@ -1,0 +1,48 @@
+{% extends 'store/layouts/main.html' %}
+
+{% block content %}
+<div class="py-2 topbar">
+    <div class="container">
+        <a class="" href="{% url 'home' %}">Home /</a>
+        <a class="" href="{% url 'collections' %}">Collections /</a>
+        <a class="" href="{% url 'collectionsviews' category_selected.slug %}">{{category_selected.name}} </a>
+    </div>
+</div>
+<div class="container">
+    <div class="row  ">
+        <div class=" col-md-12 mt-3">
+            <!-- <h5 class="text-center m-4">{{category_selected.name}}</h5> -->
+            <div class=" row m-4 " >
+                {% for i in products %}
+                    <div class="col-md-3 m-auto  " >
+                        <div class="card shadow product_data">
+                            <a href="{% url 'productDetails' i.category.slug i.slug%}">
+                                <img class="card-img-top mt-3 p-3" src="{{i.product_image.url}}" alt="Card image cap" height="220px">
+                                <h4 class="text-center m-auto">{{ i.name }}</h4>
+                            </a>
+                            <div class="container">
+                                {% csrf_token %}
+                                <input type="hidden"value='{{ i.id }}'class="prod_id">
+                                <input type="hidden"value='1'class="qty_input">
+
+                                <span class='float-start'>Rs {{i.selling_price |stringformat:'d'}}/-</span>
+                                <span class='float-right'><s>Rs {{ i.original_price |stringformat:'d'}}/-</s></span>
+                                <p></p>
+                                <div class="text-center">
+                                {% if i.quantity > 0 %}
+                                    <button type="button" class="addToCartBtn btn btn-sm btn-primary me-3 mb-3 float-start">Add to Cart <i class="fa-solid fa-cart-shopping"></i> </button>
+                                {% else %}
+                                    <button type="button" class="disabled btn btn-sm btn-danger me-3 mb-3 float-start">Out of Stock </button>
+                                {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}        
+            </div>
+        </div>
+    </div>
+</div>   
+    
+    
+{% endblock content %}

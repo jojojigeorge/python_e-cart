@@ -1,0 +1,206 @@
+{% extends 'store/layouts/main.html' %}
+
+{% block content %}
+<div class="py-2 topbar">
+    <div class="container">
+        <a class="" href="{% url 'home' %}">Home /</a>
+        <a class="" href="{% url 'checkout' %}">Checkout /</a>
+    </div>
+</div>
+<div class="container mt-5">
+    <form action="{% url 'placeorder' %}" method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h6 class="font-weight-bold text-center">Basic Details</h6>
+                        <hr>
+                        <div class="row ">
+                            <div class="col-md-6">
+                                <input type="text"  required class="form-control" value="{{userprofile.order.fname}}" name='fname' placeholder="Enter First Name">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text"  required class="form-control" value="{{userprofile.order.lname}}" name='lname'  placeholder="Enter Last Name">
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <input type="text"  required class="form-control" value="{{userprofile.order.email}}" name='email'  placeholder="Enter Email">
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <input type="text"  required class="form-control" value="{{userprofile.order.phone}}" name='phone'  placeholder="Enter Phone">
+                            </div>
+                            <div class="col-md-12 mt-2">
+                                <textarea  required class="form-control"  name='address'  placeholder="Enter Address">{{userprofile.order.address}}</textarea>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <input type="text"  required class="form-control" value="{{userprofile.order.city}}" name='city'  placeholder="Enter City">
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <input type="text"  required class="form-control" value="{{userprofile.order.state}}" name='state'  placeholder="Enter State">
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <input type="text"  required class="form-control" value="{{userprofile.order.country}}" name='country'  placeholder="Enter Country">
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <input type="text"   required class="form-control" value="{{userprofile.order.pincode}}" name='pincode'  placeholder="Enter Pincode">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 ">
+                <div class="card shadow">
+                    <div class="card-body mt-2">
+                        <h6 class="text-center font-weight-bold">Order Summary</h6>
+                        <hr>
+                        {% if cartitem %}
+                            <table class="table table-bordereds table-stripeds">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Price</th>
+                                        <th>Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {% for item in cartitem %}
+                                    <tr>
+                                        <td>
+                                            <img src="{{ item.product.product_image.url}}" class='me-3'50px width="50px">
+                                            {{item.product.name }}
+
+                                        </td>
+                                        <td>{{item.product.selling_price|stringformat:'d' }}</td>
+                                        <td>{{item.product_qty }}</td>
+
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <hr>
+                            <h6 class="font-weight-bold">Grand Total
+                                <span class="float-right font-weight-bold">{{total_price }}</span>
+                            </h6>
+                            <input type="hidden" value='COD' name="payment_mode">
+                            <button type="submit"class="mt-5 btn btn-success w-100">Cash on Delivery</button>
+                            <div class="mt-2 paypalclass" id="paypal-button-container"></div>
+                            {% else %}
+                            <h4>Your cart is empty</h4>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+{% block scripts %}
+{% if cartitem %}
+    <!-- Replace "test" with your own sandbox Business account app client ID -->
+    <script src="https://www.paypal.com/sdk/js?client-id=Af-E9DDkb7VoXj3rGLJNghZFcWry1crpVndkoHqqdeUWTZbt8PI8XRNS_qtm4TGWRQ98L96yLTan4_xL&currency=USD"></script>
+    <!-- Set up a container element for the button -->
+    <div id="paypal-button-container"></div>
+    <script>
+      paypal.Buttons({
+        // Sets up the transaction when a payment button is clicked
+        onClick:function(data,action){
+            // my validation
+            var fname = $('[name = "fname"]').val();
+            var lname = $('[name = "lname"]').val();
+            var email = $('[name = "email"]').val();
+            var phone = $('[name = "phone"]').val();
+            var address = $('[name = "address"]').val();
+            var city = $('[name = "city"]').val();
+            var state = $('[name = "state"]').val();
+            var country= $('[name = "country"]').val();
+            var pincode= $('[name = "pincode"]').val();
+            var token= $('[name = "csrfmiddlewaretoken"]').val();
+
+            if(fname==''|lname==''|email==''|phone==''|address==''|city==''|state==''|country==''|pincode=='')
+            {
+                 alert("all fields are mandatory ")
+                 return false
+            }else{
+                 return true
+            }
+        },
+        createOrder: (data, actions) => {
+          return actions.order.create({
+            purchase_units: [{
+              amount: {
+                value: '{{total_price }}' // Can also reference a variable or function
+              }
+            }]
+          });
+        },
+        // Finalize the transaction after payer approval
+        onApprove: (data, actions) => {
+            return actions.order.capture().then(function(orderData) {
+                // Successful capture! For dev/demo purposes:
+                //console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                //const transaction = orderData.purchase_units[0].payments.captures[0];
+                //alert(`Transaction ${transaction.status}: ${transaction.id}\n\nSee console for all available details`);
+                // When ready to go live, remove the alert and show a success message within this page. For example:
+                // const element = document.getElementById('paypal-button-container');
+                // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                // Or go to another URL:  actions.redirect('thank_you.html');
+                var fname = $('[name = "fname"]').val();
+                var lname = $('[name = "lname"]').val();
+                var email = $('[name = "email"]').val();
+                var phone = $('[name = "phone"]').val();
+                var address = $('[name = "address"]').val();
+                var city = $('[name = "city"]').val();
+                var state = $('[name = "state"]').val();
+                var country= $('[name = "country"]').val();
+                var pincode= $('[name = "pincode"]').val();
+                var token= $('[name = "csrfmiddlewaretoken"]').val();
+                $.ajax({
+                    method:"POST",
+                    url:'/placeorder',
+                    data:{
+                        "fname":fname,
+                        "lname":lname,
+                        "email":email,
+                        "phone":phone,
+                        "address":address,
+                        "city":city,
+                        "state":state,
+                        "country":country,
+                        "pincode":pincode,
+                        "payment_mode":'paypal',
+                        "payment_id":orderData.id,
+                        csrfmiddlewaretoken:token
+
+                    },
+                    success: function (responsec) {
+
+                        swal({
+                            title: "Orderplaced successfully",
+                            text: responsec.status,
+                            type: "success"
+                        }).then(function() {
+                            window.location = "orderdetails";
+                        });
+                    }
+                })
+            });
+        }
+      }).render('#paypal-button-container');
+    </script>
+
+{% endif %}
+<!-- sweetalert -->
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+{% endblock scripts %}

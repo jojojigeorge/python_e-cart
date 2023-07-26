@@ -1,0 +1,62 @@
+{% load static %}
+<!--start font lobster -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lobster+Two:ital@1&family=Roboto&display=swap" rel="stylesheet">
+<!--end font lobster -->
+<nav class="navbar navbar-expand-lg  navbar-light navbarcolor " >
+    <div class="col-sm-4">
+      <a class="navbar-brand px-5 ml-3" href="/">
+        <div class="logo-image">
+              <img  src="{% static 'images/favicon cart.png' %}" width="40" height="40" class="float-start my-auto d-inline-block">
+              <label class="ml-2"style=" font-family: 'Lobster Two', cursive; font-size:23px;">e-cart</label>
+        </div>
+      </a>
+      <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation"> -->
+
+   </div>
+
+
+
+
+    <div class=" col-sm-8">
+      <button class="navbar-toggler float-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon "></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav ml-auto">
+          <div class="search-bar mx-auto text-center " >
+            <form action="{% url 'productsearch' %}"method="POST">
+              {% csrf_token %}
+              <div class="input-group float-end">
+                <input type="search" required class="form-control  "name='searchbox' placeholder="Search products" id="searchproduct" >
+                <div class="input-group-prepend">
+                </div>
+                  <button  type='submit'class="input-group-text  bg-white" ><i class="fa fa-search"> </i></button>
+                </div>
+            </form>
+          </div>
+          <a class="nav-item nav-link   {% if request.resolver_match.url_name == 'home' %} active {% endif %} " href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
+          <a class="nav-item nav-link   {% if request.resolver_match.url_name == 'collections' %} active {% endif %}" href="{% url 'collections' %}">Collections</a>
+          <a class="nav-item nav-link   {% if request.resolver_match.url_name == 'wishlist' %} active {% endif %} " href="{% url 'wishlist' %}">Wishlist</a>
+          <a class="nav-item nav-link   {% if request.resolver_match.url_name == 'createcart' %} active {% endif %} " href="{% url 'createcart' %}">Cart</a>
+          {% if request.user.is_authenticated %}
+
+              <li class="nav-item dropdown">
+                <a class="nav-link  dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{request.user}}
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="{% url 'orderdetails' %}">Order Details</a>
+                  <a class="dropdown-item " href="{% url 'logoutpage' %}">Logout</a>
+                </div>
+              </li>
+          {% else %}
+            <a class="nav-item nav-link " href="{% url 'loginpage' %}">Login</a>
+            <a class="nav-item nav-link disabled  " href="{% url 'register' %}">Signup</a>
+
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
